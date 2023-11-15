@@ -8,6 +8,7 @@ const CopyPlugin = require("copy-webpack-plugin");
 const isDevelopment = process.env.NODE_ENV !== "production";
 
 const frontendDirectory = "blockbash_frontend";
+const frontendDirectory2 = "blockbash_frontend/src";
 
 const frontend_entry = path.join("src", frontendDirectory, "src", "index.html");
 
@@ -35,7 +36,7 @@ module.exports = {
     },
   },
   output: {
-    filename: "index.js",
+    filename: "index.jsx",
     path: path.join(__dirname, "dist", frontendDirectory),
   },
 
@@ -54,8 +55,19 @@ module.exports = {
       test: /\.gif$/,
       use: 'file-loader',
     },
-     { test: /\.(ts|tsx|jsx)$/, loader: "ts-loader" },
-     { test: /\.css$/, use: ['style-loader','css-loader'] }
+    {
+      test: /\.jsx$/,
+      exclude: /node_modules/,
+      use: {
+        loader: 'babel-loader',
+        options: {
+          presets: ['@babel/preset-react'],
+        },
+      },
+    },
+    { test: /\.(ts|tsx|jsx)$/, loader: "ts-loader" },
+    { test: /\.css$/, use: ['style-loader','css-loader'] },
+     
    ]
   },
   plugins: [
@@ -96,9 +108,9 @@ module.exports = {
         },
       },
     },
-    static: path.resolve(__dirname, "src", frontendDirectory, "assets"),
+    static: path.resolve(__dirname, "src", frontendDirectory2, "assets"),
     hot: true,
-    watchFiles: [path.resolve(__dirname, "src", frontendDirectory)],
+    watchFiles: [path.resolve(__dirname, "src", frontendDirectory2)],
     liveReload: true,
   },
 };
