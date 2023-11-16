@@ -1,20 +1,13 @@
-// /src/routes/messages.mo
+// Importing modules
+import express "mo:express";
+import messageController "../controllers/message";
 
-module MessagesRoutes {
-  import MessageController "controllers/message";
+// Creating router
+let router = express.Router();
 
-  public func setup() : async {
-    await MessageController.setup();
-  };
+// Defining routes
+router.post("/sendMsg", messageController.addMessage);
+router.post("/getAllMsg", messageController.getAllMessages);
 
-  public func routes() : async {
-    actor {
-      // Assuming these endpoints map to the shared actor functions.
-      shared {
-        public func sendMsg(messageData : MessageController.MessageType) : async Bool;
-        public func getAllMsg(from : Text, to : Text) : async [MessageController.ShowMessageType];
-      };
-    };
-  };
-};
-
+// Exporting router
+router;

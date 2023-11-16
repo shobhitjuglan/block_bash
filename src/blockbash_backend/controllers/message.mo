@@ -1,24 +1,10 @@
-// /src/messages.mo
+// Importing modules
+// import Message from "./message";
 
-module Messages {
-  type Message = {
-    text: Text;
-  };
-
-  type User = Text;
-
-  public type MessageType = {
-    message: Message;
-    users: [User, User];
-    sender: User;
-  };
-
-  public type ShowMessageType = {
-    fromSelf: Bool;
-    message: Text;
-  };
-
-  public addMessage : (MessageType) -> async Bool;
-  public getAllMessages : (User, User) -> async [ShowMessageType];
+// Setting up logic for message controller
+public func setup() : async {
+  // Your setup logic for the message controller.
 };
 
+// Exporting the module
+Message;
