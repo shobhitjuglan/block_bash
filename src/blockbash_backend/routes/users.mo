@@ -1,22 +1,15 @@
-// /src/routes/users.mo
+// Importing modules
+import express "mo:express";
+import userController "controllers/user";
 
-module UsersRoutes {
-  import UserController "controllers/user";
+// Creating router
+let router = express.Router();
 
-  public func setup() : async {
-    await UserController.setup();
-  };
+// Defining routes
+router.post("/register", userController.register);
+router.post("/login", userController.login);
+router.post("/setAvatar/:id", userController.setAvatar);
+router.get("/allUsers/:id", userController.getAllUsers);
 
-  public func routes() : async {
-    actor {
-      // Assuming these endpoints map to the shared actor functions.
-      shared {
-        public func register(userData : UserController.UserType) : async Bool;
-        public func login(loginData : UserController.LoginType) : async Bool;
-        public func setAvatar(setAvatarData : UserController.SetAvatarType) : async { isSet : Bool; image : Text };
-        public func getAllUsers(getAllUsersData : UserController.GetAllUsersType) : async [UserController.UserType];
-      };
-    };
-  };
-};
-
+// Exporting router
+router;

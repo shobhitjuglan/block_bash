@@ -1,69 +1,67 @@
-import Nat "mo:base/Nat";
-// // /src/main.mo
+import List "mo:base/List";
+import Text "mo:base/Text";
+import HashMap "mo:base/HashMap";
+import Prim "mo:prim";
+import Message "controllers/message";
 
-// import Messages;
-// import Users;
+actor Dkeeper {
 
-// module Main {
-
-//   public shared({Messages, Users});
-
-//   actor {
-
-//     public shared ({Messages, Users});
-
-//     public func addMessage(message : Messages.MessageType) : async Bool {
-//       return Messages.addMessage(message);
-//     };
-
-//     public func getAllMessages(from : Text, to : Text) : async [Messages.ShowMessageType] {
-//       return Messages.getAllMessages(from, to);
-//     };
-
-//     public func register(user : Users.UserType) : async Bool {
-//       return Users.register(user);
-//     };
-
-//     public func login(loginData : Users.LoginType) : async Bool {
-//       return Users.login(loginData);
-//     };
-
-//     public func setAvatar(setAvatarData : Users.SetAvatarType) : async { isSet : Bool; image : Text } {
-//       return Users.setAvatar(setAvatarData);
-//     };
-
-//     public func getAllUsers(getAllUsersData : Users.GetAllUsersType) : async [Users.User] {
-//       return Users.getAllUsers(getAllUsersData);
-//     };
-//   };
-// };
-// /src/main.mo
-
-// /src/main.mo
-
-import MessagesRoutes "routes/messages";
-import UsersRoutes "routes/users";
-import Http "mo:http";
-
-actor Main {
-
-  public func setup() : async{
-    // Initialize any global setup logic for your application.
-    await MessagesRoutes.setup();
-    await UsersRoutes.setup();
+  public type UserSchema = {
+    username : Text;
+    email : Text;
+    password : Text;
+    isAvatarImageSet : Bool;
+    avatarImage : Text;
   };
 
-  public func start() : async{
-    // Start your HTTP server.
-    let server = Http.Server.basic(
-      { port: 8080, address: Http.IpAddress.fromString("127.0.0.1") },
-      MessagesRoutes.routes() ~ UsersRoutes.routes()
-    );
-    await Http.Server.start(server);
+  public type MessageSchema = {
+    message : {
+      text : Text;
+    };
+    users : [Text];
+    sender : Text;
   };
 
-  public func main() : async {
-    await setup();
-    await start();
+  var messages : List.List<MessageSchema> = List.nil<MessageSchema>();
+
+  public func addMessage(from : Text, to : [Text], message : { text : Text }) {
+    let message : MessageSchema = {
+      message = message;
+      users = to;
+      sender = from;
+    };
+
   };
+
+  public func getAllMessages(from : Text, to : Text) : async [MessageResponse] {
+    let filteredMessages : List.List<MessageSchema> =
+      List.filter(
+        func(msg : MessageSchema) : Bool {
+          return Prim.listContains(msg.users, from) and Prim.listContains(msg.users, to);
+        },
+        messages
+      );
+
+    let sortedMessages : List.List<MessageSchema> =
+      List.sortBy(
+        func(msg1, msg2) : Bool {
+          return msg1.updatedAt < msg2.updatedAt;
+        },
+        filteredMessages
+      );
+
+    let showMessages : [MessageResponse] =
+      Array.map(
+        func(msg : MessageSchema) : MessageResponse {
+          return {
+            fromSelf = msg.sender == from;
+            message = msg.message.text;
+          };
+        },
+        sortedMessages
+      );
+
+    return showMessages;
+};
+
 };
